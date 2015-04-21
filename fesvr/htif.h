@@ -61,6 +61,8 @@ class htif_t
   addr_t sig_addr; // torture
   addr_t sig_len; // torture
 
+  bool show_perform_counter;    // print performance counter value when exit
+
   device_list_t device_list;
   syscall_t syscall_proxy;
   bcd_t bcd;

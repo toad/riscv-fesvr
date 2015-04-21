@@ -56,7 +56,7 @@ void htif_t::set_chroot(const char* where)
 
 htif_t::htif_t(const std::vector<std::string>& args)
   : exitcode(0), mem(this), seqno(1), started(false), stopped(false),
-    _mem_mb(0), _num_cores(0), sig_addr(0), sig_len(0),
+    _mem_mb(0), _num_cores(0), sig_addr(0), sig_len(0), show_perform_counter(false),
     syscall_proxy(this)
 {
   signal(SIGINT, &handle_signal);
@@ -83,6 +83,8 @@ htif_t::htif_t(const std::vector<std::string>& args)
       sig_file = arg.c_str() + strlen("+signature=");
     else if (arg.find("+chroot=") == 0)
       set_chroot(arg.substr(strlen("+chroot=")).c_str());
+    else if(arg.find("-perform") == 0)
+      show_perform_counter = true;
   }
 
   device_list.register_device(&syscall_proxy);
@@ -195,6 +197,26 @@ void htif_t::reset()
 
 void htif_t::stop()
 {
+  // get performance counter data
+  if(show_perform_counter) {
+    reg_t write_cnt, write_miss_cnt, read_cnt, read_miss_cnt, write_back_cnt;
+
+    for (uint32_t i = 0, nc = num_cores(); i < nc; i++) {
+      // L1 I$
+      read_cnt = read_cr(i, 160);
+      read_miss_cnt = read_cr(i, 161);
+      printf("Core %d I$ read %ld, read miss %ld\n", i, read_cnt, read_miss_cnt);
+
+      // L1 D$
+      write_cnt = read_cr(i, 162);
+      write_miss_cnt = read_cr(i, 163);
+      read_cnt = read_cr(i, 164);
+      read_miss_cnt = read_cr(i, 165);
+      write_back_cnt = read_cr(i, 166);
+      printf("Core %d D$ write %ld, write miss %ld, read %ld, read miss %ld, write back %ld\n", i, write_cnt, write_miss_cnt, read_cnt, read_miss_cnt, write_back_cnt);
+    }
+  }
+
   if (!sig_file.empty() && sig_len) // print final torture test signature
   {
     std::vector<uint8_t> buf(sig_len);
