@@ -193,6 +193,10 @@ void htif_t::reset()
     write_cr(i, 29, 1);
     write_cr(i, 29, 0);
   }
+
+  // reset tag cache
+  write_cr(0, 0xff, 1);
+  write_cr(0, 0xff, 0);
 }
 
 void htif_t::stop()
@@ -203,18 +207,27 @@ void htif_t::stop()
 
     for (uint32_t i = 0, nc = num_cores(); i < nc; i++) {
       // L1 I$
-      read_cnt = read_cr(i, 160);
-      read_miss_cnt = read_cr(i, 161);
+      read_cnt = read_cr(i, 0xe0);
+      read_miss_cnt = read_cr(i, 0xe1);
       printf("Core %d I$ read %ld, read miss %ld\n", i, read_cnt, read_miss_cnt);
 
       // L1 D$
-      write_cnt = read_cr(i, 162);
-      write_miss_cnt = read_cr(i, 163);
-      read_cnt = read_cr(i, 164);
-      read_miss_cnt = read_cr(i, 165);
-      write_back_cnt = read_cr(i, 166);
+      write_cnt = read_cr(i, 0xe2);
+      write_miss_cnt = read_cr(i, 0xe3);
+      read_cnt = read_cr(i, 0xe4);
+      read_miss_cnt = read_cr(i, 0xe5);
+      write_back_cnt = read_cr(i, 0xe6);
       printf("Core %d D$ write %ld, write miss %ld, read %ld, read miss %ld, write back %ld\n", i, write_cnt, write_miss_cnt, read_cnt, read_miss_cnt, write_back_cnt);
     }
+
+    // Tag$
+    write_cnt = read_cr(0, 0xf0);
+    write_miss_cnt = read_cr(0, 0xf1);
+    read_cnt = read_cr(0, 0xf2);
+    read_miss_cnt = read_cr(0, 0xf3);
+    write_back_cnt = read_cr(0, 0xf4);
+    printf("Tag cache write %ld, write miss %ld, read %ld, read miss %ld, write back %ld\n", write_cnt, write_miss_cnt, read_cnt, read_miss_cnt, write_back_cnt);
+
   }
 
   if (!sig_file.empty() && sig_len) // print final torture test signature
