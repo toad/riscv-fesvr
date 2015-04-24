@@ -203,9 +203,14 @@ void htif_t::stop()
 {
   // get performance counter data
   if(show_perform_counter) {
-    reg_t write_cnt, write_miss_cnt, read_cnt, read_miss_cnt, write_back_cnt;
+    reg_t time_cnt, write_cnt, write_miss_cnt, read_cnt, read_miss_cnt, write_back_cnt;
 
+    // read L1 cache PFCs
     for (uint32_t i = 0, nc = num_cores(); i < nc; i++) {
+      // read system timer
+      time_cnt = read_cr(0, 0x06);
+      printf("Core %d time %ld cycles\n", i, time_cnt);
+    
       // L1 I$
       read_cnt = read_cr(i, 0xe0);
       read_miss_cnt = read_cr(i, 0xe1);
