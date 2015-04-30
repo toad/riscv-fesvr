@@ -203,7 +203,7 @@ void htif_t::stop()
 {
   // get performance counter data
   if(show_perform_counter) {
-    reg_t time_cnt, write_cnt, write_miss_cnt, read_cnt, read_miss_cnt, write_back_cnt;
+    long unsigned int time_cnt, write_cnt, write_miss_cnt, read_cnt, read_miss_cnt, write_back_cnt;
 
     // read L1 cache PFCs
     for (uint32_t i = 0, nc = num_cores(); i < nc; i++) {
