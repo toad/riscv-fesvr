@@ -188,15 +188,18 @@ void htif_t::reset()
   memcpy(chunk, first_words, sizeof(first_words));
   write_chunk(0, sizeof(chunk), chunk);
 
+  if(show_perform_counter) {
+    // reset tag cache
+    write_cr(0, 0xff, 1);
+    write_cr(0, 0xff, 0);
+  }
+
   for (uint32_t i = 0; i < num_cores(); i++)
   {
     write_cr(i, 29, 1);
     write_cr(i, 29, 0);
   }
 
-  // reset tag cache
-  write_cr(0, 0xff, 1);
-  write_cr(0, 0xff, 0);
 }
 
 void htif_t::stop()
