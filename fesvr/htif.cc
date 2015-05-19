@@ -206,18 +206,18 @@ void htif_t::stop()
 {
   // get performance counter data
   if(show_perform_counter) {
-    long unsigned int time_cnt, write_cnt, write_miss_cnt, read_cnt, read_miss_cnt, write_back_cnt;
+    long long unsigned int time_cnt, write_cnt, write_miss_cnt, read_cnt, read_miss_cnt, write_back_cnt;
 
     // read L1 cache PFCs
     for (uint32_t i = 0, nc = num_cores(); i < nc; i++) {
       // read system timer
       time_cnt = read_cr(0, 0x06);
-      printf("Core %d time %ld cycles\n", i, time_cnt);
+      printf("Core %u time %llu cycles\n", i, time_cnt);
     
       // L1 I$
       read_cnt = read_cr(i, 0xe0);
       read_miss_cnt = read_cr(i, 0xe1);
-      printf("Core %d I$ read %ld, read miss %ld\n", i, read_cnt, read_miss_cnt);
+      printf("Core %u I$ read %llu, read miss %llu\n", i, read_cnt, read_miss_cnt);
 
       // L1 D$
       write_cnt = read_cr(i, 0xe2);
@@ -225,7 +225,7 @@ void htif_t::stop()
       read_cnt = read_cr(i, 0xe4);
       read_miss_cnt = read_cr(i, 0xe5);
       write_back_cnt = read_cr(i, 0xe6);
-      printf("Core %d D$ write %ld, write miss %ld, read %ld, read miss %ld, write back %ld\n", i, write_cnt, write_miss_cnt, read_cnt, read_miss_cnt, write_back_cnt);
+      printf("Core %u D$ write %llu, write miss %llu, read %llu, read miss %llu, write back %llu\n", i, write_cnt, write_miss_cnt, read_cnt, read_miss_cnt, write_back_cnt);
     }
 
     // Tag$
@@ -234,7 +234,7 @@ void htif_t::stop()
     read_cnt = read_cr(0, 0xf2);
     read_miss_cnt = read_cr(0, 0xf3);
     write_back_cnt = read_cr(0, 0xf4);
-    printf("Tag cache write %ld, write miss %ld, read %ld, read miss %ld, write back %ld\n", write_cnt, write_miss_cnt, read_cnt, read_miss_cnt, write_back_cnt);
+    printf("Tag cache write %llu, write miss %llu, read %llu, read miss %llu, write back %llu\n", write_cnt, write_miss_cnt, read_cnt, read_miss_cnt, write_back_cnt);
 
   }
 
